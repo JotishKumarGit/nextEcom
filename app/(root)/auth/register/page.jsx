@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import axios from 'axios';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import Image from 'next/image';
@@ -8,7 +9,7 @@ import Logo from '@/public/assets/images/logo-black.png';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField,FormItem,FormLabel,FormMessage,} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import ButtonLoading from '@/components/Application/ButtonLoading';
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import Link from 'next/link';
@@ -24,7 +25,7 @@ const formSchema = z.object({
   path: ["confirmPassword"]
 });
 
-function Register()  {
+function Register() {
   const [loading, setLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
 
@@ -39,7 +40,20 @@ function Register()  {
   });
 
   const handleRegisterSubmit = async (values) => {
-    console.log(values);
+    try {
+      setLoading(true);
+      const { data: registerResponse } = await axios.post('/api/auth/register', values);
+      if (!registerResponse.message) {
+        throw new Error(registerResponse.message)
+      }
+      form.reset();
+      alert(registerResponse.message);
+
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
